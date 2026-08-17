@@ -14,6 +14,12 @@ class HITLGateway:
         Packages decision_payload from state and invokes user_response = interrupt(decision_payload).
         Returns updated state dict with approved, human_feedback, and ledger_status.
         """
+        # SOTA CAS Guard: Check if state was already consumed
+        if state.get("ledger_status") == "Decision_Acquired":
+            raise ValueError(
+                "RemitConsumeConflict: This interrupt checkpoint has already been consumed."
+            )
+
         # Package a decision payload
         decision_payload = {
             "current_stage": state.get("current_stage"),

@@ -6,6 +6,8 @@ from orchestrator_core.blackboard import ArtifactHeader, BlackboardManager
 def test_generate_markdown_artifact():
     header = ArtifactHeader(
         artifact_id="art-123",
+        parent_artifact_id="art-100",
+        version_sequence=2,
         goal_id="goal-456",
         sender="AgentA",
         recipient="AgentB",
@@ -24,6 +26,8 @@ def test_parse_markdown_artifact_valid():
     raw_markdown = """```json
 {
   "artifact_id": "art-123",
+  "parent_artifact_id": "art-100",
+  "version_sequence": 2,
   "goal_id": "goal-456",
   "sender": "AgentA",
   "recipient": "AgentB",
@@ -37,6 +41,8 @@ This is the body content."""
     parsed = BlackboardManager.parse_markdown_artifact(raw_markdown)
 
     assert parsed["header"]["artifact_id"] == "art-123"
+    assert parsed["header"]["parent_artifact_id"] == "art-100"
+    assert parsed["header"]["version_sequence"] == 2
     assert parsed["header"]["goal_id"] == "goal-456"
     assert parsed["header"]["sender"] == "AgentA"
     assert parsed["header"]["recipient"] == "AgentB"

@@ -2,6 +2,11 @@ from typing import Any
 
 from langgraph.types import Command
 
+try:
+    from langgraph.types import RetryPolicy
+except ImportError:
+    from langgraph.pregel import RetryPolicy
+
 from orchestrator_core.state import AgentState
 
 STAGE_TRANSITIONS = {
@@ -11,6 +16,11 @@ STAGE_TRANSITIONS = {
     "EVALUATION": ["DEPLOY", "CODE_DEVELOPMENT", "CONCEPT_DESIGN"],
     "DEPLOY": ["CLOSE"],
 }
+
+
+def get_default_retry_policy(max_attempts: int = 3, initial_interval: float = 1.0) -> RetryPolicy:
+    """Returns a standard LangGraph RetryPolicy for resilient node execution."""
+    return RetryPolicy(max_attempts=max_attempts, initial_interval=initial_interval)
 
 
 class GovernanceGuard:
@@ -63,3 +73,14 @@ class GovernanceGuard:
             "retry_count": 0,
             "ledger_status": status_msg,
         }
+
+    @staticmethod
+    def fallback_to_saga(state: AgentState, error: Exception | None = None) -> Command:
+        """
+        Routes execution to the SAGA compensation node upon unrecoverable node errors.
+        """
+        error_msg = str(error) if error else "Fatal execution error"
+        return Command(
+            update={"ledger_status": f"SAGA_Triggered: {error_msg}", "error_context": error_msg},
+            goto="saga_compensation_node",
+        )

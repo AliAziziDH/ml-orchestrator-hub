@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from orchestrator_core.hitl import HITLGateway
 from orchestrator_core.state import AgentState
 
@@ -57,3 +59,9 @@ def test_resume_thread_safely():
 
     assert command_arg.resume == decision
     assert config_arg == {"configurable": {"thread_id": "thread-123"}}
+
+
+def test_request_approval_node_double_resume():
+    state = {"ledger_status": "Decision_Acquired", "current_stage": "EVALUATION"}
+    with pytest.raises(ValueError, match="RemitConsumeConflict"):
+        HITLGateway.request_approval_node(state)

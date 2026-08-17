@@ -1,16 +1,20 @@
 import re
 from typing import Any
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 
 class ArtifactHeader(BaseModel):
-    artifact_id: str
-    goal_id: str
-    sender: str
-    recipient: str
-    stage: str
-    metadata: dict[str, Any]
+    artifact_id: str = Field(..., description="Unique UUID for this document version")
+    parent_artifact_id: str | None = Field(
+        None, description="Lineage pointer to parent artifact to prevent stale overwrites"
+    )
+    version_sequence: int = Field(1, description="Monotonically increasing version counter")
+    goal_id: str = Field(..., description="ID of the governing workflow/experiment ledger")
+    sender: str = Field(..., description="Agent that produced the artifact")
+    recipient: str = Field(..., description="Target reader")
+    stage: str = Field(..., description="The SDLC stage at creation")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional structured keys")
 
 
 class BlackboardManager:
