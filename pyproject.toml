@@ -12,7 +12,12 @@ dependencies = [
     "numpy",
     "pandas",
     "scipy",
-    "scikit-learn"
+    "scikit-learn",
+    "langgraph>=0.3.0",
+    "langchain-core>=0.3.0",
+    "pydantic>=2.0.0",
+    "psycopg[binary]>=3.1.0",
+    "langgraph-checkpoint-postgres"
 ]
 
 [project.scripts]
