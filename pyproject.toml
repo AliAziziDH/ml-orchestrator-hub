@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orchestrator_core"
+version = "0.1.0"
+description = "Core ML Orchestrator Package"
+authors = [{name = "ML Team"}]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "scikit-learn"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff"
+]
+
+[tool.setuptools.packages.find]
+include = ["orchestrator_core*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

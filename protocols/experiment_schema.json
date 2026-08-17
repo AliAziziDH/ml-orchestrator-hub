@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Experiment Log Schema",
+  "description": "A formal JSON Schema validating the fields and types produced by log_experiment.",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp of the experiment."
+    },
+    "git_commit": {
+      "type": "string",
+      "description": "Git commit hash of the orchestrator/agent."
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Name of the project."
+    },
+    "experiment_tag": {
+      "type": "string",
+      "description": "Unique identifier for the experiment."
+    },
+    "model_architecture": {
+      "type": "string",
+      "description": "Model architecture used."
+    },
+    "metric_name": {
+      "type": "string",
+      "description": "Name of the evaluation metric."
+    },
+    "oof_score": {
+      "type": "number",
+      "description": "Out-of-fold validation score."
+    },
+    "public_lb_score": {
+      "type": ["number", "null"],
+      "description": "Optional public leaderboard score."
+    },
+    "num_folds": {
+      "type": "integer",
+      "description": "Number of cross-validation folds."
+    },
+    "status": {
+      "type": "string",
+      "description": "Experiment status, usually SUCCESS or FAILED."
+    },
+    "key_insights": {
+      "type": "string",
+      "description": "Key insights or notes from the experiment."
+    }
+  },
+  "required": [
+    "timestamp",
+    "git_commit",
+    "project_name",
+    "experiment_tag",
+    "model_architecture",
+    "metric_name",
+    "oof_score",
+    "num_folds",
+    "status",
+    "key_insights"
+  ]
+}
