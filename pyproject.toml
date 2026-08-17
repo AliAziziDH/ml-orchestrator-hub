@@ -15,6 +15,9 @@ dependencies = [
     "scikit-learn"
 ]
 
+[project.scripts]
+orchestrator-sync = "orchestrator_core.sync:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest",
