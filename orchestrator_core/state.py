@@ -4,12 +4,16 @@ from typing import Annotated, Any, TypedDict
 from langchain_core.messages import BaseMessage
 
 
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     messages: Annotated[list[BaseMessage], operator.add]
     experiment_ledger: dict[str, Any]
     current_stage: str
     steps: int
     retry_count: int
+    approved: bool | None
+    human_feedback: str | None
+    completed_steps: list[str]
+    ledger_status: str | None
     error_context: str | None
 
 
