@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any, Dict, List, Optional
 
 from orchestrator_core.drive_sync import DriveWorkspaceSync
 from orchestrator_core.email_gateway import EmailNotificationFormatter
