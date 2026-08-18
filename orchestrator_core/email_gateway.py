@@ -3,7 +3,6 @@ import json
 import re
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, Optional
 
 from pydantic import BaseModel, Field
 
@@ -20,7 +19,7 @@ class DecisionAction(str, Enum):
 class ParsedDecision(BaseModel):
     action: DecisionAction
     feedback: str
-    target_stage: Optional[str] = None
+    target_stage: str | None = None
     raw_text: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -29,7 +28,7 @@ class EmailNotificationFormatter:
     @staticmethod
     def format_approval_email(
         state: AgentState, thread_id: str, checkpoint_id: str
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         experiment_ledger = state.get("experiment_ledger") or {}
         summary = experiment_ledger.get("summary")
         if not summary:

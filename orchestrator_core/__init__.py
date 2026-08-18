@@ -1,20 +1,20 @@
 from .blackboard import ArtifactHeader, BlackboardManager
-from .governance import GovernanceGuard
-from .hitl import HITLGateway
 from .email_gateway import (
-    EmailNotificationFormatter,
-    DecisionParser,
     DecisionAction,
+    DecisionParser,
+    EmailNotificationFormatter,
     ParsedDecision,
 )
+from .governance import GovernanceGuard
+from .hitl import HITLGateway
 
 __all__ = [
     "ArtifactHeader",
     "BlackboardManager",
+    "DecisionAction",
+    "DecisionParser",
+    "EmailNotificationFormatter",
     "GovernanceGuard",
     "HITLGateway",
-    "EmailNotificationFormatter",
-    "DecisionParser",
-    "DecisionAction",
     "ParsedDecision",
 ]
