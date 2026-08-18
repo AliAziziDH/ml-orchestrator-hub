@@ -16,9 +16,7 @@ _test_lock = threading.Lock()
 _test_consumed_checkpoints = set()
 
 
-def _resume_thread_safely_locked(
-    app: Any, thread_id: str, decision: dict[str, Any]
-) -> Any:
+def _resume_thread_safely_locked(app: Any, thread_id: str, decision: dict[str, Any]) -> Any:
     # First get the state to see the checkpoint we are resuming
     config = {"configurable": {"thread_id": thread_id}}
     state_snap = app.get_state(config)
@@ -93,15 +91,12 @@ def test_concurrency_cas_guard():
 
     for err in errors:
         assert isinstance(err, ValueError)
-        assert (
-            "RemitConsumeConflict: This interrupt checkpoint has already been consumed."
-            in str(err)
+        assert "RemitConsumeConflict: This interrupt checkpoint has already been consumed." in str(
+            err
         )
 
     # Check final state
     final_state = app.get_state(config).values
     assert final_state["approved"] is True
     assert final_state["human_feedback"] == "Looks good."
-    assert (
-        "Decision" in final_state["ledger_status"]
-    )  # Check if status updated correctly
+    assert "Decision" in final_state["ledger_status"]  # Check if status updated correctly
