@@ -60,6 +60,6 @@ def test_successful_resume(mock_resume):
     assert "decision" in result
 
     mock_resume.assert_called_once()
-    args, kwargs = mock_resume.call_args
+    _, kwargs = mock_resume.call_args
     assert kwargs["thread_id"] == "t-123"
     assert kwargs["app"] == app_mock
