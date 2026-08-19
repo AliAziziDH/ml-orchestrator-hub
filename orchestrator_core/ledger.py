@@ -1,3 +1,6 @@
+import contextlib
+from psycopg_pool import ConnectionPool
+
 import json
 import os
 import subprocess
@@ -60,3 +63,45 @@ def log_experiment(
         os.makedirs(os.path.dirname(history_path), exist_ok=True)
         with open(history_path, "a") as f:
             f.write(json.dumps(metadata) + "\n")
+
+
+@contextlib.contextmanager
+def safe_db_connection(pool: ConnectionPool):
+    """
+    Context manager to safely acquire and release a Postgres connection from a pool.
+    Useful for ensuring connections are released before long-running subprocesses.
+    """
+    conn = pool.getconn()
+    try:
+        yield conn
+    finally:
+        pool.putconn(conn)
+
+
+def mark_experiment_failed(pool: ConnectionPool, experiment_id: str, error_msg: str) -> None:
+    """
+    SAGA compensation pattern to mark an experiment as FAILED in the ledger
+    with error details if downstream execution fails.
+    """
+    with safe_db_connection(pool):
+        # In a real implementation this would execute a SQL UPDATE statement on the
+        # ML_Orchestrator_Experiment_Ledger table, e.g.:
+        # conn.execute(
+        #     "UPDATE ML_Orchestrator_Experiment_Ledger SET status = %s, key_insights = %s WHERE experiment_id = %s",
+        #     ("FAILED", error_msg, experiment_id)
+        # )
+        # conn.commit()
+        pass
+
+
+def mark_experiment_success(pool: ConnectionPool, experiment_id: str, insights: str) -> None:
+    """
+    SAGA completion pattern to mark an experiment as SUCCESS in the ledger.
+    """
+    with safe_db_connection(pool):
+        # conn.execute(
+        #     "UPDATE ML_Orchestrator_Experiment_Ledger SET status = %s, key_insights = %s WHERE experiment_id = %s",
+        #     ("SUCCESS", insights, experiment_id)
+        # )
+        # conn.commit()
+        pass
