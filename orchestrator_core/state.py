@@ -1,6 +1,6 @@
+from typing import Literal, Optional, List
+from orchestrator_core.cost import TokenCostLedger
 import operator
-from collections.abc import Callable
-from datetime import datetime, timezone
 from enum import Enum
 from typing import Annotated, Any, TypedDict
 
@@ -31,26 +31,65 @@ def check_circuit_breaker(state: AgentState, max_steps: int = 15) -> bool:
 
 
 class ExperimentMeta(BaseModel):
-    experiment_id: str
-    description: str | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    status: str = "PENDING"
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    experiment_id: str = Field(..., description="Unique experiment identifier, e.g., EXP-HP-001")
+    experiment_tag: str = Field(
+        ..., description="Short tag descriptive of the run (e.g., baseline_slsqp)"
+    )
+    model_architecture: str = Field(
+        ..., description="Detailed description of model ensemble pipeline"
+    )
+    oof_cv_score: Optional[float] = Field(
+        None, description="Computed global Out-Of-Fold Cross-Validation score"
+    )
+    status: Literal["PENDING", "RUNNING", "SUCCESS", "FAILED"] = Field(default="PENDING")
+    key_insights: Optional[str] = Field(default="")
 
 
 class TrainingTelemetry(BaseModel):
-    fold_index: int | None = None
-    step: int | None = None
-    train_loss: float | None = None
-    val_loss: float | None = None
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    current_fold: int = Field(
+        default=0, description="The CV fold currently undergoing active training"
+    )
+    total_folds: int = Field(default=10, description="Total CV folds planned for the training run")
+    fold_scores: List[float] = Field(
+        default_factory=list, description="Computed metric scores per completed fold"
+    )
+    progress_percentage: float = Field(
+        default=0.0, description="Completion percentage of the active training task"
+    )
+    last_heartbeat: Optional[str] = Field(
+        None, description="ISO timestamp of the last heartbeat pulse"
+    )
+    stall_rounds: int = Field(
+        default=0, description="Number of rounds stalled with same output/error (oscillation index)"
+    )
+    last_error_signature: Optional[str] = Field(
+        None, description="Last recorded traceback/error signature"
+    )
+
+    def increment_stall(self) -> None:
+        """Increment the stall rounds counter."""
+        self.stall_rounds += 1
+
+    def reset_cycle(self) -> None:
+        """Reset the stall rounds for a new cycle."""
+        self.stall_rounds = 0
+
+    def record_fold_score(self, score: float) -> None:
+        """Record a new fold score."""
+        self.fold_scores.append(score)
 
 
-class Phase4AgentState(AgentState, total=False):
-    experiment_meta: ExperimentMeta | None
-    telemetry: list[TrainingTelemetry]
-    stage: str
-    active_tools: list[str]
+class Phase4AgentState(TypedDict):
+    stage: Literal["CONCEPT_DESIGN", "CODE_DEVELOPMENT", "CI_TEST", "EVALUATION", "DEPLOY", "CLOSE"]
+    downstream_repo_path: str
+    active_tools: List[str]
+    experiment: ExperimentMeta
+    telemetry: TrainingTelemetry
+    cost_tracker: TokenCostLedger
+    circuit_breaker_triggered: bool
+    error_message: Optional[str]
+    requires_human_approval: bool
+    attempts: int
 
 
 class Stage(str, Enum):
@@ -59,24 +98,3 @@ class Stage(str, Enum):
     CI_TEST = "CI_TEST"
     EVALUATION = "EVALUATION"
     DEPLOY = "DEPLOY"
-
-
-class ToolRegistry:
-    def __init__(self) -> None:
-        self._registry: dict[str, dict[str, Callable[..., Any]]] = {
-            Stage.CONCEPT_DESIGN.value: {},
-            Stage.CODE_DEVELOPMENT.value: {},
-            Stage.CI_TEST.value: {},
-            Stage.EVALUATION.value: {},
-            Stage.DEPLOY.value: {},
-        }
-
-    def register_tool(self, stage: str, tool_name: str, tool_func: Callable[..., Any]) -> None:
-        """Registers a tool for a specific stage."""
-        if stage not in self._registry:
-            self._registry[stage] = {}
-        self._registry[stage][tool_name] = tool_func
-
-    def get_tools(self, stage: str) -> dict[str, Callable[..., Any]]:
-        """Returns tools registered for a specific stage."""
-        return self._registry.get(stage, {})
