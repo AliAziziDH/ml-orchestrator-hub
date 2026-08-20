@@ -15,7 +15,7 @@ def concept_node(state: AgentState) -> dict[str, Any]:
     return {
         "current_stage": "CODE_DEVELOPMENT",
         "steps": state.get("steps", 0) + 1,
-        "completed_steps": state.get("completed_steps", []) + ["concept_node"],
+        "completed_steps": [*state.get("completed_steps", []), "concept_node"],
     }
 
 
@@ -23,7 +23,7 @@ def dev_node(state: AgentState) -> dict[str, Any]:
     return {
         "current_stage": "CI_TEST",
         "steps": state.get("steps", 0) + 1,
-        "completed_steps": state.get("completed_steps", []) + ["dev_node"],
+        "completed_steps": [*state.get("completed_steps", []), "dev_node"],
     }
 
 
@@ -31,7 +31,7 @@ def ci_node(state: AgentState) -> dict[str, Any]:
     return {
         "current_stage": "EVALUATION",
         "steps": state.get("steps", 0) + 1,
-        "completed_steps": state.get("completed_steps", []) + ["ci_node"],
+        "completed_steps": [*state.get("completed_steps", []), "ci_node"],
     }
 
 
@@ -42,7 +42,7 @@ def evaluation_node(state: AgentState) -> dict[str, Any]:
     return {
         "current_stage": "EVALUATION",
         "steps": state.get("steps", 0) + 1,
-        "completed_steps": state.get("completed_steps", []) + ["evaluation_node"],
+        "completed_steps": [*state.get("completed_steps", []), "evaluation_node"],
     }
 
 
@@ -51,7 +51,7 @@ def deploy_node(state: AgentState) -> dict[str, Any]:
         "ledger_status": "Decision_Acquired",
         "current_stage": "DEPLOY",
         "steps": state.get("steps", 0) + 1,
-        "completed_steps": state.get("completed_steps", []) + ["deploy_node"],
+        "completed_steps": [*state.get("completed_steps", []), "deploy_node"],
     }
 
 
