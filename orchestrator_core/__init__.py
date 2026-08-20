@@ -6,7 +6,7 @@ from .email_gateway import (
     EmailNotificationFormatter,
     ParsedDecision,
 )
-from .email_listener import EmailWebhookHandler
+from .email_listener import process_inbound_webhook
 from .governance import GovernanceGuard
 from .hitl import HITLGateway
 from .scheduler import HeartbeatScheduler
@@ -18,9 +18,9 @@ __all__ = [
     "DecisionParser",
     "DriveWorkspaceSync",
     "EmailNotificationFormatter",
-    "EmailWebhookHandler",
     "GovernanceGuard",
     "HITLGateway",
     "HeartbeatScheduler",
     "ParsedDecision",
+    "process_inbound_webhook",
 ]
