@@ -15,7 +15,6 @@ class WebhookSecurityError(Exception):
     """Raised when an inbound webhook fails authentication or security policies [100]."""
 
 
-
 # --- Decoupled Payload Pydantic Contract [19] ---
 class ConductorDecision(BaseModel):
     decision: str = Field(..., description="Action verdict: APPROVE, REJECT, or RETRY")
