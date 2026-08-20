@@ -60,6 +60,6 @@ if __name__ == "__main__":
 
     try:
         generate_email_template(args.thread_id, args.checkpoint_id)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         print(e, file=sys.stderr)
         sys.exit(1)

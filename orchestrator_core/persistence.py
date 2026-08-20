@@ -110,6 +110,6 @@ def cleanup_thread(checkpointer, thread_id: str) -> bool:
             return True
 
         return True
-    except Exception as e:  # noqa: BLE001, F841
+    except Exception as e:
         # Log or capture error gracefully without crashing the graph
         return False

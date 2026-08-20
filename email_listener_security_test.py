@@ -14,7 +14,6 @@ from pydantic import BaseModel, Field, ValidationError
 class WebhookSecurityError(Exception):
     """Raised when an inbound webhook fails authentication or security policies [100]."""
 
-    pass
 
 
 # --- Decoupled Payload Pydantic Contract [19] ---
@@ -73,7 +72,7 @@ class EmailListenerGateway:
             thread_id = parts[0]
             checkpoint_id = parts[1]
             provided_sig = parts[2]
-        except Exception:  # noqa: BLE001
+        except Exception:
             raise WebhookSecurityError(
                 "Malformed SMTP tracking header detected. Rejection triggered."
             )
@@ -109,7 +108,7 @@ class EmailListenerGateway:
                 feedback=body_text[:1000],  # Cap size to avoid buffer bloat [100]
             )
         except ValidationError as e:
-            raise WebhookSecurityError(f"Data Schema Contradiction: {str(e)}")
+            raise WebhookSecurityError(f"Data Schema Contradiction: {e!s}")
 
 
 # =====================================================================

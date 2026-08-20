@@ -9,7 +9,6 @@ from typing import Any
 class RemitConsumeConflict(ValueError):
     """Raised when an interrupt checkpoint has already been consumed by a concurrent process."""
 
-    pass
 
 
 class CASGatedCheckpointer:
