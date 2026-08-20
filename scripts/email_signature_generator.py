@@ -8,18 +8,17 @@ import sys
 def generate_email_template(thread_id: str, checkpoint_id: str) -> None:
     """
     Generates a cryptographically signed email template.
+    Matches orchestrator_core/email_listener.py implementation exactly.
     """
     secret = os.environ.get("ORCHESTRA_HMAC_SECRET")
     if not secret:
-        raise ValueError(
-            "CRITICAL ERROR: ORCHESTRA_HMAC_SECRET environment variable is not set. Cryptographic operations aborted."
-        )
+        raise ValueError("CRITICAL ERROR: ORCHESTRA_HMAC_SECRET environment variable is not set. Cryptographic operations aborted.")
 
-    message = f"{thread_id}.{checkpoint_id}".encode()
+    message = f"{thread_id}:{checkpoint_id}".encode()
     secret_bytes = secret.encode("utf-8")
     signature = hmac.new(secret_bytes, message, hashlib.sha256).hexdigest()
 
-    token = f"<{signature}.{thread_id}.{checkpoint_id}@orchestra.local>"
+    token = f"<orch-{thread_id}-{checkpoint_id}-{signature}@orchestra.ai>"
 
     body = (
         "APPROVE: Start the baseline SLSQP optimization run for EXP-HP-001 on house-prices-kaggle. "
@@ -29,7 +28,7 @@ def generate_email_template(thread_id: str, checkpoint_id: str) -> None:
     template = f"""
 From: ali@ali-antigravity.io
 To: spark-webhook@ali-antigravity-hub-2026.iam.gserviceaccount.com
-Subject: Re: [SUSPENDED] Action Required: SLSQP Weight Optimization (thread_phase7_kaggle_hp)
+Subject: Re: [SUSPENDED] Action Required: SLSQP Weight Optimization ({thread_id})
 In-Reply-To: {token}
 References: {token}
 
@@ -39,9 +38,7 @@ References: {token}
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Generate a signed email template to trigger pipeline."
-    )
+    parser = argparse.ArgumentParser(description="Generate a signed email template to trigger pipeline.")
     parser.add_argument(
         "--thread-id",
         type=str,
