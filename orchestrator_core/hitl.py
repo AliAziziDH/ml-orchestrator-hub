@@ -1,3 +1,7 @@
+import json
+import logging
+from datetime import datetime, timezone
+from orchestrator_core.exceptions import RemitConsumeConflict
 from typing import Any, Literal
 
 from langchain_core.runnables import RunnableConfig
@@ -66,9 +70,27 @@ class HITLGateway:
         }
 
     @staticmethod
-    def resume_thread_safely(app: Any, thread_id: str, decision: dict[str, Any]) -> Any:
+    def resume_thread_safely(
+        app: Any, thread_id: str, decision: dict[str, Any], checkpoint_id: str | None = None
+    ) -> Any:
         """
         Invokes app.invoke(Command(resume=decision), config={"configurable": {"thread_id": thread_id}}).
+        Catches RemitConsumeConflict to gracefully halt idempotent consumptions.
         """
         config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
-        return app.invoke(Command(resume=decision), config=config)
+        if checkpoint_id:
+            config["configurable"]["checkpoint_id"] = checkpoint_id
+
+        try:
+            return app.invoke(Command(resume=decision), config=config)
+        except RemitConsumeConflict:
+            # Output a structured JSON log
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "event_type": "CAS_CONFLICT",
+                "thread_id": thread_id,
+                "checkpoint_id": checkpoint_id or "unknown",
+                "resolution": "HALTED_IDEMPOTENT",
+            }
+            logging.warning(json.dumps(log_payload))
+            return None
