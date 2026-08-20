@@ -98,15 +98,12 @@ def test_semantic_tool_finder():
 
     def write_file():
         """Writes content to a file on disk."""
-        pass
 
     def read_file():
         """Reads content from a file."""
-        pass
 
     def execute_sql():
         """Executes a SQL query against the database."""
-        pass
 
     registry.register_tool(Stage.CODE_DEVELOPMENT.value, "write_file", write_file)
     registry.register_tool(Stage.CODE_DEVELOPMENT.value, "read_file", read_file)
