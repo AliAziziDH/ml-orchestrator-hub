@@ -1,15 +1,16 @@
 import json
 import logging
 from datetime import datetime, timezone
-from orchestrator_core.exceptions import RemitConsumeConflict
 from typing import Any, Literal
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command, interrupt
 from pydantic import BaseModel, Field, model_validator
 
+from orchestrator_core.exceptions import RemitConsumeConflict
 from orchestrator_core.state import AgentState
 
+logger = logging.getLogger(__name__)
 
 class ConductorDecision(BaseModel):
     action: Literal["APPROVE", "REJECT", "FEEDBACK_RETRY", "SAGA_ROLLBACK"]
@@ -92,5 +93,5 @@ class HITLGateway:
                 "checkpoint_id": checkpoint_id or "unknown",
                 "resolution": "HALTED_IDEMPOTENT",
             }
-            logging.warning(json.dumps(log_payload))
+            logger.warning(json.dumps(log_payload))
             return None
