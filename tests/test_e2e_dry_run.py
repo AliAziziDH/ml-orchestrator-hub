@@ -108,7 +108,6 @@ def simulate_email_webhook(email_payload, raw_email_body, app, t_id):
     import re
     from unittest.mock import patch
 
-
     token_match = re.search(
         r"<!--\s*SEC_TOKEN:\s*([A-Za-z0-9+/=_-]+)\s*-->", email_payload["html_body"]
     )
