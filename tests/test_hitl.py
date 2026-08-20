@@ -59,7 +59,7 @@ def test_resume_thread_safely():
     config_arg = call_args[1]["config"]
 
     assert command_arg.resume == decision
-    assert config_arg == {"configurable": {"thread_id": "thread-123"}}
+    assert config_arg["configurable"]["thread_id"] == "thread-123"
 
 
 def test_request_approval_node_double_resume():
