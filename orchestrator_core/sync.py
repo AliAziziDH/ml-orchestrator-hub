@@ -13,7 +13,7 @@ def sync_ledger(file_path: str) -> None:
         return
 
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             run_data: dict[str, Any] = json.load(f)
 
         print(f"Successfully loaded run data from {file_path}")

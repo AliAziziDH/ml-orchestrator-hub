@@ -1,10 +1,11 @@
-from typing import Annotated, Any, Literal, Optional, TypedDict
-from orchestrator_core.cost import TokenCostLedger
 import operator
 from enum import Enum
+from typing import Annotated, Any, Literal, TypedDict
 
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
+
+from orchestrator_core.cost import TokenCostLedger
 
 
 class AgentState(TypedDict, total=False):
@@ -37,11 +38,11 @@ class ExperimentMeta(BaseModel):
     model_architecture: str = Field(
         ..., description="Detailed description of model ensemble pipeline"
     )
-    oof_cv_score: Optional[float] = Field(
+    oof_cv_score: float | None = Field(
         None, description="Computed global Out-Of-Fold Cross-Validation score"
     )
     status: Literal["PENDING", "RUNNING", "SUCCESS", "FAILED"] = Field(default="PENDING")
-    key_insights: Optional[str] = Field(default="")
+    key_insights: str | None = Field(default="")
 
 
 class TrainingTelemetry(BaseModel):
@@ -55,13 +56,13 @@ class TrainingTelemetry(BaseModel):
     progress_percentage: float = Field(
         default=0.0, description="Completion percentage of the active training task"
     )
-    last_heartbeat: Optional[str] = Field(
+    last_heartbeat: str | None = Field(
         None, description="ISO timestamp of the last heartbeat pulse"
     )
     stall_rounds: int = Field(
         default=0, description="Number of rounds stalled with same output/error (oscillation index)"
     )
-    last_error_signature: Optional[str] = Field(
+    last_error_signature: str | None = Field(
         None, description="Last recorded traceback/error signature"
     )
 
@@ -86,7 +87,7 @@ class Phase4AgentState(TypedDict):
     telemetry: TrainingTelemetry
     cost_tracker: TokenCostLedger
     circuit_breaker_triggered: bool
-    error_message: Optional[str]
+    error_message: str | None
     requires_human_approval: bool
     attempts: int
 
