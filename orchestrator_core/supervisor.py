@@ -15,6 +15,9 @@ def supervisor_route(state: AgentState, target_action: str) -> Command:
     """
     Supervisor routing node that emits dynamic routing and validates business stage gates.
     """
+    if state.get("should_compact"):
+        return Command(goto="critic_compaction", update={"should_compact": False})
+
     current_stage = state.get("current_stage")
 
     if current_stage and target_action in VALID_STAGE_TRANSITIONS.get(current_stage, []):
