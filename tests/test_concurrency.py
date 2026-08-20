@@ -21,12 +21,14 @@ def _resume_thread_safely_locked(app: Any, thread_id: str, decision: dict[str, A
     config = {"configurable": {"thread_id": thread_id}}
     state_snap = app.get_state(config)
 
-    if not state_snap.tasks or not state_snap.tasks[0].interrupts:
-        raise ValueError("No interrupt to resume")
-
-    checkpoint_id = state_snap.tasks[0].id
-
     with _test_lock:
+        if not state_snap.tasks or not state_snap.tasks[0].interrupts:
+            raise ValueError(
+                "RemitConsumeConflict: This interrupt checkpoint has already been consumed."
+            )
+
+        checkpoint_id = state_snap.tasks[0].id
+
         if checkpoint_id in _test_consumed_checkpoints:
             raise ValueError(
                 "RemitConsumeConflict: This interrupt checkpoint has already been consumed."
