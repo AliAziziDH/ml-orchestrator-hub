@@ -1,9 +1,25 @@
-from typing import Any
+from typing import Any, Literal, Optional
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command, interrupt
+from pydantic import BaseModel, Field, model_validator
 
 from orchestrator_core.state import AgentState
+
+
+class ConductorDecision(BaseModel):
+    action: Literal["APPROVE", "REJECT", "FEEDBACK_RETRY", "SAGA_ROLLBACK"]
+    feedback_text: Optional[str] = Field(default=None, max_length=2000)
+    thread_id: str = Field(min_length=1)
+    checkpoint_id: str = Field(min_length=1)
+
+    model_config = {"frozen": True}
+
+    @model_validator(mode="after")
+    def validate_feedback_text(self):
+        if self.action == "FEEDBACK_RETRY" and not self.feedback_text:
+            raise ValueError("feedback_text must be provided when action is FEEDBACK_RETRY")
+        return self
 
 
 class HITLGateway:

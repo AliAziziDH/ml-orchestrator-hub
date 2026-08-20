@@ -1,8 +1,9 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pydantic import ValidationError
 
-from orchestrator_core.hitl import HITLGateway
+from orchestrator_core.hitl import ConductorDecision, HITLGateway
 from orchestrator_core.state import AgentState
 
 
@@ -65,3 +66,64 @@ def test_request_approval_node_double_resume():
     state = {"ledger_status": "Decision_Acquired", "current_stage": "EVALUATION"}
     with pytest.raises(ValueError, match="RemitConsumeConflict"):
         HITLGateway.request_approval_node(state)
+
+
+def test_conductor_decision_valid_actions():
+    # Test all valid actions without feedback text requirement
+    for action in ["APPROVE", "REJECT", "SAGA_ROLLBACK"]:
+        decision = ConductorDecision(action=action, thread_id="t1", checkpoint_id="c1")
+        assert decision.action == action
+        assert decision.thread_id == "t1"
+        assert decision.checkpoint_id == "c1"
+        assert decision.feedback_text is None
+
+
+def test_conductor_decision_feedback_retry_valid():
+    # Test valid FEEDBACK_RETRY
+    decision = ConductorDecision(
+        action="FEEDBACK_RETRY",
+        feedback_text="Please update the parameters",
+        thread_id="t1",
+        checkpoint_id="c1",
+    )
+    assert decision.action == "FEEDBACK_RETRY"
+    assert decision.feedback_text == "Please update the parameters"
+
+
+def test_conductor_decision_feedback_retry_missing_text():
+    # Test invalid FEEDBACK_RETRY
+    with pytest.raises(ValidationError) as exc_info:
+        ConductorDecision(action="FEEDBACK_RETRY", thread_id="t1", checkpoint_id="c1")
+    assert "feedback_text must be provided when action is FEEDBACK_RETRY" in str(exc_info.value)
+
+
+def test_conductor_decision_feedback_text_length():
+    with pytest.raises(ValidationError):
+        ConductorDecision(
+            action="FEEDBACK_RETRY", feedback_text="a" * 2001, thread_id="t1", checkpoint_id="c1"
+        )
+
+
+def test_conductor_decision_frozen():
+    decision = ConductorDecision(action="APPROVE", thread_id="t1", checkpoint_id="c1")
+    with pytest.raises(ValidationError):
+        decision.action = "REJECT"
+
+
+def test_conductor_decision_invalid_action():
+    with pytest.raises(ValidationError):
+        ConductorDecision(
+            action="INVALID_ACTION",  # type: ignore
+            thread_id="t1",
+            checkpoint_id="c1",
+        )
+
+
+def test_conductor_decision_empty_thread_id():
+    with pytest.raises(ValidationError):
+        ConductorDecision(action="APPROVE", thread_id="", checkpoint_id="c1")
+
+
+def test_conductor_decision_empty_checkpoint_id():
+    with pytest.raises(ValidationError):
+        ConductorDecision(action="APPROVE", thread_id="t1", checkpoint_id="")
