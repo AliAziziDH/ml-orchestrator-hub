@@ -12,6 +12,7 @@ from orchestrator_core.state import AgentState
 
 logger = logging.getLogger(__name__)
 
+
 class ConductorDecision(BaseModel):
     action: Literal["APPROVE", "REJECT", "FEEDBACK_RETRY", "SAGA_ROLLBACK"]
     feedback_text: str | None = Field(default=None, max_length=2000)
