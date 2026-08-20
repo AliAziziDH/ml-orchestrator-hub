@@ -1,5 +1,4 @@
-import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 
@@ -101,10 +100,10 @@ if __name__ == "__main__":
     # هزینه مجموع = ۰.۹۷۵ دلار (بیشتر از بودجه مجاز ۰.۹۰ دلاری)
     print(f"Total Cost: ${updated_ledger.accumulated_cost_usd:.4f} USD")
     print(f"Is Circuit Breaker Triggered? {updated_ledger.is_budget_exhausted}")
-    assert updated_ledger.is_budget_exhausted == True, "Circuit breaker should be triggered!"
+    assert updated_ledger.is_budget_exhausted, "Circuit breaker should be triggered!"
     
     # تست فعال‌سازی قانون ۴۰-۶۰٪
     compaction_report = monitor.check_compaction_trigger(current_context_tokens=120000, max_context_limit=200000)
     print(f"Compaction Report: {compaction_report}")
-    assert compaction_report["should_compact"] == True
+    assert compaction_report["should_compact"]
     print("\n[SUCCESS] ContextTokenMonitor verified successfully.")

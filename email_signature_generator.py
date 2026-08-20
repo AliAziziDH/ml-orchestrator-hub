@@ -1,7 +1,6 @@
 import hmac
 import hashlib
 import os
-from datetime import datetime, timezone
 
 def generate_secure_message_id(thread_id: str, checkpoint_id: str, secret_key: str, domain: str = "ali-antigravity.io") -> str:
     """
@@ -36,7 +35,7 @@ if __name__ == "__main__":
     print("=" * 80)
     print(f"[*] Thread ID:      {THREAD_ID}")
     print(f"[*] Checkpoint ID:  {CHECKPOINT_ID}")
-    print(f"[*] Secure Message-ID (To put in In-Reply-To & References headers):")
+    print("[*] Secure Message-ID (To put in In-Reply-To & References headers):")
     print(f"    {msg_id}")
     print("\n" + "=" * 80)
     print("FORMULATED LIVE SMTP EMAIL COMMAND TEMPLATE")

@@ -2,7 +2,7 @@ import unittest
 import sqlite3
 import threading
 import concurrent.futures
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 # Define custom exception for SOTA Concurrency Gating
 class RemitConsumeConflict(ValueError):

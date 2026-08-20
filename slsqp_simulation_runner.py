@@ -1,14 +1,12 @@
 import sys
-import os
 import json
-from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 
 # Ensure we can import our compaction and routing classes
 sys.path.append("/workspace/artifacts")
 sys.path.append("/workspace/scratch")
 
-from compaction_and_routing import StructuredCompactionManager, SemanticToolFinder, ToolSchema, CompactionSummary
+from compaction_and_routing import StructuredCompactionManager, SemanticToolFinder, ToolSchema
 
 # =====================================================================
 # 1. SLSQP EXPERIMENT CATALOG & METADATA DEFINITIONS
@@ -132,7 +130,7 @@ def run_slsqp_simulation():
         })
         state["messages"].append({
             "role": "assistant", 
-            "content": f"Jules: Trying to re-run with modified seed or dropping NaN index. Attempting execution."
+            "content": "Jules: Trying to re-run with modified seed or dropping NaN index. Attempting execution."
         })
         # Simulate heavy token accumulation in each attempt
         state["cost_tracker"]["input_tokens"] += 25000
