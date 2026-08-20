@@ -19,6 +19,7 @@ class AgentState(TypedDict, total=False):
     completed_steps: list[str]
     ledger_status: str | None
     error_context: str | None
+    should_compact: bool | None
 
 
 def check_circuit_breaker(state: AgentState, max_steps: int = 15) -> bool:
