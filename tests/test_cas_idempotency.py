@@ -3,12 +3,12 @@ import logging
 from unittest.mock import MagicMock
 
 import pytest
-
+from langchain_core.runnables.config import RunnableConfig
 from langgraph.types import Command
+
 from orchestrator_core.exceptions import RemitConsumeConflict
 from orchestrator_core.hitl import HITLGateway
 from orchestrator_core.persistence import OrchestraMemorySaver
-from langchain_core.runnables.config import RunnableConfig
 
 
 def test_cas_idempotency_memory_saver():
