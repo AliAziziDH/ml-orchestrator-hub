@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command, interrupt
@@ -9,7 +9,7 @@ from orchestrator_core.state import AgentState
 
 class ConductorDecision(BaseModel):
     action: Literal["APPROVE", "REJECT", "FEEDBACK_RETRY", "SAGA_ROLLBACK"]
-    feedback_text: Optional[str] = Field(default=None, max_length=2000)
+    feedback_text: str | None = Field(default=None, max_length=2000)
     thread_id: str = Field(min_length=1)
     checkpoint_id: str = Field(min_length=1)
 
