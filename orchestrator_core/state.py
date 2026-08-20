@@ -1,8 +1,7 @@
-from typing import Literal, Optional, List
+from typing import Annotated, Any, Literal, Optional, TypedDict
 from orchestrator_core.cost import TokenCostLedger
 import operator
 from enum import Enum
-from typing import Annotated, Any, TypedDict
 
 from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field
@@ -50,7 +49,7 @@ class TrainingTelemetry(BaseModel):
         default=0, description="The CV fold currently undergoing active training"
     )
     total_folds: int = Field(default=10, description="Total CV folds planned for the training run")
-    fold_scores: List[float] = Field(
+    fold_scores: list[float] = Field(
         default_factory=list, description="Computed metric scores per completed fold"
     )
     progress_percentage: float = Field(
@@ -82,7 +81,7 @@ class TrainingTelemetry(BaseModel):
 class Phase4AgentState(TypedDict):
     stage: Literal["CONCEPT_DESIGN", "CODE_DEVELOPMENT", "CI_TEST", "EVALUATION", "DEPLOY", "CLOSE"]
     downstream_repo_path: str
-    active_tools: List[str]
+    active_tools: list[str]
     experiment: ExperimentMeta
     telemetry: TrainingTelemetry
     cost_tracker: TokenCostLedger
