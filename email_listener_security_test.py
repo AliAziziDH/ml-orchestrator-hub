@@ -72,7 +72,7 @@ class EmailListenerGateway:
             thread_id = parts[0]
             checkpoint_id = parts[1]
             provided_sig = parts[2]
-        except Exception:
+        except (IndexError, ValueError, AttributeError):
             raise WebhookSecurityError(
                 "Malformed SMTP tracking header detected. Rejection triggered."
             )
