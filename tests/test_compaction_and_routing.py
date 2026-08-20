@@ -1,8 +1,8 @@
 import pytest
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
-from orchestrator_core.state import Stage
 from orchestrator_core.nodes import critic_compaction_node
+from orchestrator_core.state import Stage
 from orchestrator_core.tools import ToolRegistry, tool_search_tool
 
 
