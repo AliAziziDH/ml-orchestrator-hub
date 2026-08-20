@@ -26,7 +26,7 @@ class DriveWorkspaceSync:
                 continue
 
             local_path = os.path.join(local_dir, filename)
-            with open(local_path, "r", encoding="utf-8") as f:
+            with open(local_path, encoding="utf-8") as f:
                 content = f.read()
 
             try:
@@ -59,7 +59,7 @@ class DriveWorkspaceSync:
                 continue
 
             file_path = os.path.join(self.workspace_dir, filename)
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
 
             try:

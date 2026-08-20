@@ -24,7 +24,7 @@ def test_log_experiment(tmp_path):
     assert os.path.exists(output_path)
     assert os.path.exists(history_path)
 
-    with open(output_path, "r") as f:
+    with open(output_path) as f:
         data = json.load(f)
 
     assert data["project_name"] == "TestProject"
@@ -45,12 +45,12 @@ def test_log_experiment(tmp_path):
         history_path=str(history_path),
     )
 
-    with open(output_path, "r") as f:
+    with open(output_path) as f:
         data2 = json.load(f)
     assert data2["experiment_tag"] == "exp002"
 
     # Check history
-    with open(history_path, "r") as f:
+    with open(history_path) as f:
         lines = f.readlines()
 
     assert len(lines) == 2
