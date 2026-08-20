@@ -1,7 +1,6 @@
-from datetime import datetime, timezone
-from typing import Any
-
+from typing import Dict, Any
 from pydantic import BaseModel, Field
+from datetime import datetime, timezone
 
 
 # =====================================================================
@@ -61,7 +60,7 @@ class ContextTokenMonitor:
 
     def check_compaction_trigger(
         self, current_context_tokens: int, max_context_limit: int
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         """
         Applies the SOTA 40-60% Context Rule. Triggers proactive compaction
         before reaching the model's performance cliff (Context Rot).
@@ -82,7 +81,7 @@ class ContextTokenMonitor:
 
     def log_suspend_resume_overhead(
         self, suspend_ckpt_tokens: int, resume_input_tokens: int
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         """
         Computes the serialization/deserialization overhead of thread suspension.
         Tracks if repeated interrupts are causing context amplification.

@@ -1,8 +1,7 @@
 import unittest
-from typing import Literal
-
-from pydantic import BaseModel, Field
+from typing import Literal, Optional, List
 from typing_extensions import TypedDict
+from pydantic import BaseModel, Field
 
 # =====================================================================
 # 1. State Schema Definitions (Phase 4-v3 Cost & JIT Specs)
@@ -30,19 +29,19 @@ class TrainingTelemetry(BaseModel):
         default=0, description="The CV fold currently undergoing active training"
     )
     total_folds: int = Field(default=10, description="Total CV folds planned for the training run")
-    fold_scores: list[float] = Field(
+    fold_scores: List[float] = Field(
         default_factory=list, description="Computed metric scores per completed fold"
     )
     progress_percentage: float = Field(
         default=0.0, description="Completion percentage of the active training task"
     )
-    last_heartbeat: str | None = Field(
+    last_heartbeat: Optional[str] = Field(
         None, description="ISO timestamp of the last heartbeat pulse"
     )
     stall_rounds: int = Field(
         default=0, description="Number of rounds stalled with same output/error (oscillation index)"
     )
-    last_error_signature: str | None = Field(
+    last_error_signature: Optional[str] = Field(
         None, description="Last recorded traceback/error signature"
     )
 
@@ -55,22 +54,22 @@ class ExperimentMeta(BaseModel):
     model_architecture: str = Field(
         ..., description="Detailed description of model ensemble pipeline"
     )
-    oof_cv_score: float | None = Field(
+    oof_cv_score: Optional[float] = Field(
         None, description="Computed global Out-Of-Fold Cross-Validation score"
     )
     status: Literal["PENDING", "RUNNING", "SUCCESS", "FAILED"] = Field(default="PENDING")
-    key_insights: str | None = Field(default="")
+    key_insights: Optional[str] = Field(default="")
 
 
 class Phase4AgentState(TypedDict):
     stage: Literal["CONCEPT_DESIGN", "CODE_DEVELOPMENT", "CI_TEST", "EVALUATION", "DEPLOY", "CLOSE"]
     downstream_repo_path: str
-    active_tools: list[str]
+    active_tools: List[str]
     experiment: ExperimentMeta
     telemetry: TrainingTelemetry
     cost_tracker: TokenCostLedger
     circuit_breaker_triggered: bool
-    error_message: str | None
+    error_message: Optional[str]
     requires_human_approval: bool
     attempts: int
 

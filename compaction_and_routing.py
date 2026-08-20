@@ -1,8 +1,7 @@
 import json
-from datetime import datetime, timezone
-from typing import Any, Literal
-
+from typing import List, Dict, Any, Optional, Literal
 from pydantic import BaseModel, Field
+from datetime import datetime, timezone
 
 # =====================================================================
 # 1. STRUCTURED SECTIONED COMPACTION SCHEMAS & MANAGER [14, 19]
@@ -14,22 +13,22 @@ class CompactionSummary(BaseModel):
         ...,
         description="The ultimate objective the agent is currently trying to achieve in this session.",
     )
-    key_decisions: list[dict[str, str]] = Field(
+    key_decisions: List[Dict[str, str]] = Field(
         default_factory=list,
         description="Decisions made, each with a brief rationale (e.g., {'decision': 'XGBoost max_depth=6', 'rationale': 'prevent overfitting'}).",
     )
-    files_modified: list[dict[str, str]] = Field(
+    files_modified: List[Dict[str, str]] = Field(
         default_factory=list,
         description="List of files created or modified with a brief description of the edits.",
     )
-    errors_encountered: list[dict[str, str]] = Field(
+    errors_encountered: List[Dict[str, str]] = Field(
         default_factory=list,
         description="Compiler errors, validation crashes, or math mismatches caught and how they were resolved.",
     )
-    next_steps: list[str] = Field(
+    next_steps: List[str] = Field(
         default_factory=list, description="The ordered list of planned sub-tasks remaining."
     )
-    critical_math_context: dict[str, Any] = Field(
+    critical_math_context: Dict[str, Any] = Field(
         default_factory=dict,
         description="Key mathematical constraints, OOF metric baselines, dimension requirements, and learning rate boundaries.",
     )
@@ -46,7 +45,7 @@ class StructuredCompactionManager:
         self.keep_recent_turns = keep_recent_turns
 
     def build_compaction_prompt(
-        self, messages: list[dict[str, Any]], existing_summary: dict[str, Any] | None = None
+        self, messages: List[Dict[str, Any]], existing_summary: Optional[Dict[str, Any]] = None
     ) -> str:
         """Constructs a dense system instruction for the LLM to perform structured sectioned summary [17]."""
         existing_str = json.dumps(existing_summary, indent=2) if existing_summary else "None"
@@ -70,11 +69,11 @@ You must update the structured summary of the work done so far based on the newl
 
     def compact(
         self,
-        messages: list[dict[str, Any]],
-        existing_summary: dict[str, Any] | None = None,
+        messages: List[Dict[str, Any]],
+        existing_summary: Optional[Dict[str, Any]] = None,
         system_prompt: str = "You are an expert ML Engineer agent.",
         persistent_config_str: str = "",
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         """
         Executes history pruning and context rebuilding [19].
         Rebuilds the working memory: [System, Persistent Config, Summary Message] + [Recent Message Window]
@@ -148,7 +147,7 @@ The previous history has been compressed to prevent context rot.
         }
 
     def _generate_simulated_compaction(
-        self, new_turns: list[dict[str, Any]], existing: dict[str, Any] | None
+        self, new_turns: List[Dict[str, Any]], existing: Optional[Dict[str, Any]]
     ) -> CompactionSummary:
         """Parser helper mimicking LLM-based structured accumulation [14]."""
         # Create base summary or load existing
@@ -225,7 +224,7 @@ class ToolSchema(BaseModel):
     name: str
     description: str
     stage_affinity: Literal["CONCEPT_DESIGN", "CODE_DEVELOPMENT", "CI_TEST", "EVALUATION", "DEPLOY"]
-    parameters_schema: dict[str, Any]
+    parameters_schema: Dict[str, Any]
 
 
 class SemanticToolFinder:
@@ -267,12 +266,12 @@ class SemanticToolFinder:
         "it",
     }
 
-    def __init__(self, catalog: list[ToolSchema]):
+    def __init__(self, catalog: List[ToolSchema]):
         self.catalog = catalog
 
     def select_tools_semantically(
         self, query: str, active_stage: str, max_tools: int = 5, relevance_threshold: float = 0.01
-    ) -> list[ToolSchema]:
+    ) -> List[ToolSchema]:
         """
         Finds the most semantically relevant tools for a task description,
         strictly bounded by the active SDOF stage [26, 284].
@@ -309,7 +308,7 @@ class SemanticToolFinder:
 
         return selected
 
-    def expose_meta_search_tool(self) -> dict[str, Any]:
+    def expose_meta_search_tool(self) -> Dict[str, Any]:
         """Exposes the system's single meta-tool definition under Anthropic's Pattern 1 [317]."""
         return {
             "name": "tool_search_tool",

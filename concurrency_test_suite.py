@@ -1,13 +1,15 @@
-import concurrent.futures
+import unittest
 import sqlite3
 import threading
-import unittest
-from typing import Any
+import concurrent.futures
+from typing import Dict, Any
 
 
 # Define custom exception for SOTA Concurrency Gating
 class RemitConsumeConflict(ValueError):
     """Raised when an interrupt checkpoint has already been consumed by a concurrent process."""
+
+    pass
 
 
 class CASGatedCheckpointer:
@@ -65,7 +67,7 @@ class MockHITLGateway:
         self.checkpointer = checkpointer
 
     def resume_checkpoint_safely(
-        self, thread_id: str, checkpoint_id: str, decision: dict[str, Any]
+        self, thread_id: str, checkpoint_id: str, decision: Dict[str, Any]
     ) -> str:
         """
         Attempts to resume a thread exactly once using a CAS claim check.

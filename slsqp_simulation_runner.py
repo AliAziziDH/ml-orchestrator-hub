@@ -1,12 +1,12 @@
-import json
 import sys
+import json
 from datetime import datetime, timezone
 
 # Ensure we can import our compaction and routing classes
 sys.path.append("/workspace/artifacts")
 sys.path.append("/workspace/scratch")
 
-from compaction_and_routing import SemanticToolFinder, StructuredCompactionManager, ToolSchema
+from compaction_and_routing import StructuredCompactionManager, SemanticToolFinder, ToolSchema
 
 # =====================================================================
 # 1. SLSQP EXPERIMENT CATALOG & METADATA DEFINITIONS

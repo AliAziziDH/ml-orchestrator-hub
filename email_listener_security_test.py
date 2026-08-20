@@ -2,23 +2,26 @@
 # email_listener_security_test.py - White-Hat Stress Test Suite
 # Evaluates 3-Layer Security Model, HMAC Signatures, and Decoupled Isolation [65, 100]
 # =====================================================================
-import hashlib
 import hmac
+import hashlib
 import unittest
-from typing import Any
-
 from pydantic import BaseModel, Field, ValidationError
+from typing import Dict, Any, Optional
 
 
 # --- System-Level Security Exceptions ---
 class WebhookSecurityError(Exception):
     """Raised when an inbound webhook fails authentication or security policies [100]."""
 
+    pass
+
 
 # --- Decoupled Payload Pydantic Contract [19] ---
 class ConductorDecision(BaseModel):
     decision: str = Field(..., description="Action verdict: APPROVE, REJECT, or RETRY")
-    feedback: str | None = Field(None, description="Passive text containing feedback or overrides")
+    feedback: Optional[str] = Field(
+        None, description="Passive text containing feedback or overrides"
+    )
 
 
 # --- Standing Email Listener Implementation (to be tested) ---
@@ -29,12 +32,12 @@ class EmailListenerGateway:
 
     def generate_token(self, thread_id: str, checkpoint_id: str) -> str:
         """Generates a secure cryptographically-signed signature for headers [5]."""
-        payload = f"{thread_id}:{checkpoint_id}".encode()
+        payload = f"{thread_id}:{checkpoint_id}".encode("utf-8")
         signature = hmac.new(self.hmac_secret, payload, hashlib.sha256).hexdigest()
         return f"<orch-{thread_id}-{checkpoint_id}-{signature}@orchestra.ai>"
 
     def process_inbound_webhook(
-        self, payload: dict[str, Any], headers: dict[str, str]
+        self, payload: Dict[str, Any], headers: Dict[str, str]
     ) -> ConductorDecision:
         """
         Executes the 3-Layer Security Protocol [100]:
@@ -75,7 +78,7 @@ class EmailListenerGateway:
             )
 
         # Recalculate signature to verify tamper-proof origin [5]
-        expected_payload = f"{thread_id}:{checkpoint_id}".encode()
+        expected_payload = f"{thread_id}:{checkpoint_id}".encode("utf-8")
         expected_sig = hmac.new(self.hmac_secret, expected_payload, hashlib.sha256).hexdigest()
 
         if not hmac.compare_digest(provided_sig, expected_sig):
@@ -105,7 +108,7 @@ class EmailListenerGateway:
                 feedback=body_text[:1000],  # Cap size to avoid buffer bloat [100]
             )
         except ValidationError as e:
-            raise WebhookSecurityError(f"Data Schema Contradiction: {e!s}")
+            raise WebhookSecurityError(f"Data Schema Contradiction: {str(e)}")
 
 
 # =====================================================================
