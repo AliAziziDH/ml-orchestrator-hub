@@ -1,8 +1,8 @@
-import unittest
+import concurrent.futures
 import sqlite3
 import threading
-import concurrent.futures
-from typing import Dict, Any
+import unittest
+from typing import Any
 
 
 # Define custom exception for SOTA Concurrency Gating
@@ -67,7 +67,7 @@ class MockHITLGateway:
         self.checkpointer = checkpointer
 
     def resume_checkpoint_safely(
-        self, thread_id: str, checkpoint_id: str, decision: Dict[str, Any]
+        self, thread_id: str, checkpoint_id: str, decision: dict[str, Any]
     ) -> str:
         """
         Attempts to resume a thread exactly once using a CAS claim check.
