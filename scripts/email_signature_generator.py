@@ -12,7 +12,9 @@ def generate_email_template(thread_id: str, checkpoint_id: str) -> None:
     """
     secret = os.environ.get("ORCHESTRA_HMAC_SECRET")
     if not secret:
-        raise ValueError("CRITICAL ERROR: ORCHESTRA_HMAC_SECRET environment variable is not set. Cryptographic operations aborted.")
+        raise ValueError(
+            "CRITICAL ERROR: ORCHESTRA_HMAC_SECRET environment variable is not set. Cryptographic operations aborted."
+        )
 
     message = f"{thread_id}:{checkpoint_id}".encode()
     secret_bytes = secret.encode("utf-8")
@@ -38,7 +40,9 @@ References: {token}
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate a signed email template to trigger pipeline.")
+    parser = argparse.ArgumentParser(
+        description="Generate a signed email template to trigger pipeline."
+    )
     parser.add_argument(
         "--thread-id",
         type=str,
