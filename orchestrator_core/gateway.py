@@ -4,13 +4,24 @@ import logging
 
 logger = logging.getLogger(__name__)
 import os
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request
 
 from orchestrator_core.email_listener import process_inbound_webhook
 
-app = FastAPI(title="Orchestrator Webhook Gateway")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup actions
+    logger.info("Starting up Orchestrator Webhook Gateway")
+    yield
+    # Shutdown actions
+    logger.info("Shutting down Orchestrator Webhook Gateway")
+
+
+app = FastAPI(title="Orchestrator Webhook Gateway", lifespan=lifespan)
 
 # Standard Cloudflare/SendGrid IP ranges as fallback
 DEFAULT_ALLOWED_IPS = [

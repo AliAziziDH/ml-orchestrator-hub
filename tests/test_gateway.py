@@ -83,3 +83,16 @@ def test_gateway_security_error(mock_process):
 
     assert response.status_code == 401
     assert response.json() == {"detail": "DKIM verification failed."}
+
+
+def test_gateway_lifespan():
+    # The TestClient automatically runs the lifespan context manager when the context is entered
+    with TestClient(app):
+        # We just need to make sure we can enter the lifespan and start up without errors
+        assert True
+
+
+def test_gateway_405_method_not_allowed():
+    # Test that the app is responding but we get a 405 for GET on a POST endpoint
+    response = client.get("/v1/webhook/email")
+    assert response.status_code == 405
