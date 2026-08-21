@@ -18,9 +18,7 @@ class WebhookSecurityError(Exception):
 # --- Decoupled Payload Pydantic Contract [19] ---
 class ConductorDecision(BaseModel):
     decision: str = Field(..., description="Action verdict: APPROVE, REJECT, or RETRY")
-    feedback: str | None = Field(
-        None, description="Passive text containing feedback or overrides"
-    )
+    feedback: str | None = Field(None, description="Passive text containing feedback or overrides")
 
 
 # --- Standing Email Listener Implementation (to be tested) ---

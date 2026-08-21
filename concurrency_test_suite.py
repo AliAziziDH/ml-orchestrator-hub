@@ -10,7 +10,6 @@ class RemitConsumeConflict(ValueError):
     """Raised when an interrupt checkpoint has already been consumed by a concurrent process."""
 
 
-
 class CASGatedCheckpointer:
     """
     Simulates a Compare-and-Swap (CAS) gated checkpointer on a SQL backend.
