@@ -17,7 +17,10 @@ dependencies = [
     "langchain-core>=0.3.0",
     "pydantic>=2.0.0",
     "psycopg[binary]>=3.1.0",
-    "langgraph-checkpoint-postgres"
+    "langgraph-checkpoint-postgres",
+    "fastapi",
+    "httpx",
+    "python-multipart"
 ]
 
 [project.scripts]
