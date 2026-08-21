@@ -102,10 +102,9 @@ def parse_sendgrid_webhook(raw_payload: dict[str, Any]) -> tuple[dict[str, Any],
         # we check the dkim field or assume true if envelope is present.
         # SendGrid provides 'dkim' field with json string of signature if dkim passed.
         "dkim_verified": "dkim" in raw_payload,
-
         # 'envelope' is a JSON string in SendGrid payload containing 'from'
         "sender": "",
-        "text_body": raw_payload.get("text", "")
+        "text_body": raw_payload.get("text", ""),
     }
 
     try:
@@ -126,8 +125,8 @@ def parse_sendgrid_webhook(raw_payload: dict[str, Any]) -> tuple[dict[str, Any],
     # a verified sender, we might want to manually set it.
     # But let's stick to the presence of 'dkim' field for now, or check SPF.
     if not payload["dkim_verified"] and raw_payload.get("dkim_verified"):
-         # Allow explicit override from our own test mocks
-         payload["dkim_verified"] = raw_payload.get("dkim_verified")
+        # Allow explicit override from our own test mocks
+        payload["dkim_verified"] = raw_payload.get("dkim_verified")
 
     # Explicitly check for test mock flags
     if "dkim_verified" in raw_payload and isinstance(raw_payload["dkim_verified"], bool):
@@ -157,11 +156,14 @@ async def email_webhook(request: Request):
         content_type = request.headers.get("Content-Type", "")
         if "application/json" in content_type:
             raw_payload = await request.json()
-        elif "multipart/form-data" in content_type or "application/x-www-form-urlencoded" in content_type:
+        elif (
+            "multipart/form-data" in content_type
+            or "application/x-www-form-urlencoded" in content_type
+        ):
             form_data = await request.form()
             raw_payload = dict(form_data)
         else:
-             raw_payload = await request.json()
+            raw_payload = await request.json()
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON payload")
 
@@ -175,6 +177,7 @@ async def email_webhook(request: Request):
     except Exception as e:
         # Let's import WebhookSecurityError to handle it specifically
         from orchestrator_core.exceptions import WebhookSecurityError
+
         if isinstance(e, WebhookSecurityError):
             logger.error(f"Security error processing webhook: {e}")
             raise HTTPException(status_code=401, detail=str(e))
